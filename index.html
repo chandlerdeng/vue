@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .btn{background: #{{color}}}
+        .hide{display: none}
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="hide">
+
+        <p>This will never change: {{* message }}</p>
+
+        <p>computed: {{ compMsg }}</p>
+
+        <p>{{ message.split("").reverse().join("")}}</p>
+
+        <p>getMsg(): {{ getMsg() }}</p>
+
+        <p>isPhone?"":getMsg(): {{ isPhone?"":getMsg() }}</p>
+
+        <p>{{ message | capitalize }} ** {{ message | uppercase}} ** {{1000 | currency 'RMB' | lowercase}}</p>
+
+        <p>{{1}}{{1 | pluralize 'st' 'nd' 'rd' 'th'}};{{3}}{{3 | pluralize 'st' 'nd' 'rd' 'th'}}</p>
+
+        <p>{{ jsonObj | json 4}}</p>
+
+        <p>{{{ raw_html }}}</p>
+        <!-- 静态 partial -->
+        <partial name="static-partial"></partial>
+
+        <!-- 动态 partial -->
+        <partial name="{{rawDynPartHtml}}"></partial>
+        <!-- 渲染 partial，id === vm.partialId -->
+        <partial v-bind:name="rawDynPartHtml"></partial>
+
+        <!-- 动态 partial，使用 v-bind 缩写语法 -->
+        <partial :name="rawDynPartHtml"></partial>
+
+
+        <input v-model="message" v-on:keyup.enter="addMsg"/>
+        <input v-model="compMsg" @keyup.enter="addMsg"/><br/>
+        <input v-model="filter" @keyup.enter="search"/>
+
+        <ul>
+            <li v-for="value in jsonObj">
+                {{ $key }} : {{ value | json}}
+            </li>
+        </ul>
+
+        <span v-for="n in 10">{{ n }} </span>
+
+        <ul>
+            <!--
+            <li v-for="todo in todos" >  $index
+            <li v-for="(index, todo) in todos" >  index
+            <li v-for="todo of todos" >  $index
+            fields = ['fieldA', 'fieldB']
+            <div v-for="user in users | filterBy searchText in fields">
+            <div v-for="user in users | filterBy myCustomFilterFunction">
+            -->
+            <li v-for="todo of todos  | filterBy 'Bush' in 'text' 'name' | orderBy 'name' -1" >
+                {{ todo.text }}
+                <button :class="btnCls" :style="myBtn1Style" v-on:click="removeIt($index)">remove</button>
+                <button :class="[btnCls]" :style="[myBtn1Style, '']" v-on:click="removeIt($index)">change</button>
+            </li>
+            <ul>
+                <template v-for="todo of todos" >
+                    <li>{{ todo.text }}</li>
+                    <li class="divider">
+                        <input type="text" @keyup.enter="changeIt($index, $event)">
+                    </li>
+                </template>
+            </ul>
+        </ul>
+        <p>
+            <input v-model="color" lazy/>
+            <button class="s" :class="{'btn':myBtn.btn, 'small':myBtn.small}" v-on:click="revMsg | debounce 400">Reverse Message</button>
+            <button class="s" :class="myBtn" v-on:click="revMsg | debounce 400">Reverse Message</button>
+            <button class="s" :class="[btnCls, true?smallCls:'']" v-on:click="revMsg | debounce 400">Reverse Message</button>
+        </p>
+
+    </div>
+    <div class="hide">
+
+        <p v-if="isPhone">This is for phone</p>
+        <template v-else>not phone</template>
+        <p class="hide" v-show="!isPhone">show it</p>
+        <p v-else>hide it1</p>
+
+        <p><a v-bind:href="url">url bind</a>; <a :href="url">url bind</a>; <a href="{{}}">url bind</a></p>
+
+        <!-- 阻止单击事件冒泡 event.preventDefault() 或 event.stopPropagation()。 -->
+        <a v-on:click.stop="onSubmit"></a>
+
+        <!-- 提交事件不再重载页面 -->
+        <form @submit.prevent="onSubmit" action="#onsubmit">
+        <button type="submit">submit</button>
+        </form>
+
+        <!-- 修饰符可以串联 -->
+        <a v-on:click.stop.prevent="doThat"></a>
+
+        <!-- 只有修饰符 -->
+        <form v-on:submit.prevent action="#nocallback">
+            <button type="submit">no callback</button>
+        </form>
+
+        <!-- 添加事件侦听器 -->
+        <div v-on:click="onSubmit('v-on:click')"
+             style="width:100px;height: 100px;border:1px solid black">
+            <button >test</button></div>
+
+        <!-- 添加事件侦听器时使用 capture 模式 -->
+        <div v-on:click.capture="onSubmit('v-on:click.capture')"
+             style="width:100px;height: 100px;border:1px solid black">
+            <button >test</button></div>
+
+        <!-- 只当事件在该元素本身（而不是子元素）触发时触发回调 -->
+        <div v-on:click.self="onSubmit('v-on:click.self')"
+             style="width:100px;height: 100px;border:1px solid black">
+            <button >test</button>
+        </div>
+
+        <!-- 只有在 keyCode 是 13 时调用 vm.submit() -->
+        <input v-on:keyup.13="submit">
+
+        <!--可以自定义按键别名：-->
+        <input v-on:keyup.f1="submit">
+
+        <!--全部的按键别名：
+        enter     tab    delete    esc    space    up    down    left    right-->
+
+    </div>
+    <div class="hide">
+
+        <p>
+            <style>input.ck:checked{opacity: 0.3}</style>
+            <input id="test" type="checkbox" v-model="check1" class="ck"
+                   :true-value="message"
+                   :false-value="'oh my god'">
+            <label for="checkbox">{{ check1 }}</label></p>
+
+        <p>
+            <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+            <label for="jack">Jack</label>
+            <input type="checkbox" id="john" value="John" v-model="checkedNames">
+            <label for="john">John</label>
+            <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+            <label for="mike">Mike</label>
+            <br>
+            <span>Checked names: {{ checkedNames | json }}</span></p>
+
+        <!--Radio-->
+        <p>
+            <input type="radio" id="one" :value="message" v-model="picked">
+            <label for="one">One</label>
+            <br>
+            <input type="radio" id="two" :value="{number: 123}" v-model="picked">
+            <label for="two">Two</label>
+            <br>
+            <span>Picked: {{ picked | json}}</span></p>
+
+        <!--select-->
+        <p><select v-model="selected" multiple>
+            <option v-for="todo in todos" :value="todo.name">{{todo.text}}</option>
+        </select>
+            <span>Selected: {{ selected |json }}</span></p>
+
+        <p><input v-model="age" number debounce="500">{{age}}</p>
+
+    </div>
+</div>
+<div id="demo2" class="hide">
+    <!--animation-->
+    <style>
+        /* 必需 */
+        .expand-transition {
+            transition: all 3s ease;
+            height: 30px;
+            padding: 10px;
+            background-color: #eee;
+            overflow: hidden;
+        }
+        /* .expand-enter 定义进入的开始状态 */
+        /* .expand-leave 定义离开的结束状态 */
+        .expand-enter {
+            height: 30px;
+            opacity: 0;
+        }.expand-leave {
+             height: 0;
+             padding: 0 10px;
+             opacity: 0;
+         }
+
+
+        .bounce-transition {
+              display: inline-block; /* 否则 scale 动画不起作用 */
+          }
+        .bounce-enter {
+            animation: bounce-in .5s;
+        }
+        .bounce-leave {
+            animation: bounce-out .5s;
+        }
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        @keyframes bounce-out {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(0);
+            }
+        }
+
+        .staggered-transition {
+             transition: all 1s ease;
+             overflow: hidden;
+             margin: 10px;
+             height: 20px;
+         }
+        .staggered-enter, .staggered-leave {
+            opacity: 0;
+            height: 0;
+        }
+    </style>
+    <p><div v-if="show" transition="fade">animate without css</div></p>
+
+    <p><div v-if="show" transition="expand">transition with css</div></p>
+
+    <p><div v-if="show" transition="bounce">animate with css</div></p>
+
+    <p>
+        <input v-model="query">
+        <ul>
+            <li v-for="item in list | filterBy query"
+                transition="staggered"
+                sta2gger="100">
+                {{item.msg}}
+            </li>
+        </ul>
+    </p>
+</div>
+
+<div id="demo3" class="hide">
+    <p>
+    <template id="tmpl1">
+        <p><input type='text' v-model='name'><button v-on:click="fire">fire event:{{age}}</button>
+        </p>
+        <slot>comp1 default slot</slot>
+        <slot name="slot1">comp1 slot1</slot>
+        <slot name="slot2">comp1 slot2</slot>
+    </template>
+        <table>
+            <tr>
+                <td>
+                    <my-component>this will be shown as it is</my-component>
+                </td>
+            </tr>
+            <tr>
+                events: {{eventObjs|json}}
+                <comp1 v-ref:list v-for="item in list"
+                       v-bind:name="item.msg"
+                       v-bind:age="11"
+                       v-on:comp-event="compHdlr">text to replace the slot
+                    <p slot="slot1">slot 1 comes from parent</p>
+                    <p slot="slot3">slot 3 comes from parent</p>
+                </comp1>
+                <comp1 v-ref:comp1
+                       v-bind:name="comp1.name"
+                       v-bind:age="comp1.age"
+                       v-on:comp-event="compHdlr"></comp1>
+            </tr>
+            <tr is="my-component" note="tr will be replaced by this component">
+                <td>this innerhtml will be removed</td>
+            </tr>
+        </table>
+    </p>
+</div>
+<div id="demo4">
+    <div style="white-space: nowrap; overflow: hidden; width: 100%">
+        <style>
+            .fade-transition{transition: all 1s ease; width:100%;display: block;position: absolute;left:0}
+            .fade-enter{left:100%;width:0}
+            .fade-leave{left:-100%;width:0}
+        </style>
+        <template id="tmpl2">
+            <div>
+                <p><input type='text' v-model='name'><button v-on:click="fire">fire event:{{age}}</button>
+                </p>
+                <slot name="slot1">comp1 slot1</slot>
+            </div>
+        </template>
+        <component :is="current" transition="fade" transit2ion-mode="in-out" >
+            <p slot="slot1">text for all views</p>
+        </component>
+    </div>
+    <my-directive></my-directive>
+    <div v-css-height="50" v-bind:accord-to="currWidth"></div>
+</div>
+</body>
+<script src="../libs/node_modules/jquery/dist/jquery.js"></script>
+<script src="../libs/node_modules/jquery-throttle-debounce-master/jquery.ba-throttle-debounce.js"></script>
+<script src="../libs/node_modules/vue/dist/vue.js"></script>
+<script>
+Vue.directive("css-height", {
+    params:["accord-to"],
+    paramWatchers:{
+        accordTo: Vue.util.debounce(function(val, oval){
+            console.log("css-height: accord");
+            this.el.style.height = (val* this.expression/1000) + "px";
+        }, 0)
+    },
+    bind: function(){
+        console.log("css-height: bind");
+        this.el.style.height = (this.params.accordTo * this.expression/1000) + "px";
+    }
+});
+Vue.elementDirective("my-directive", {
+    bind: function(){
+                var a = this.el;
+
+            }
+});
+Vue.transition('fade', {
+    enterClass: 'fade-enter',
+    leaveClass: 'fade-leave',
+    beforeEnter: function (el) {
+        console.log('beforeEnter');
+        el.className += " fade-enter";
+    }
+});
+var demo4 = new Vue({
+    el: '#demo4',
+    data: {
+        currWidth: document.body.clientWidth,
+        eventObjs: [],
+        current: "comp1",
+        list: [
+            { msg: 'Bruce Lee', name: "component 1", age: 10 },
+            { msg: 'Jackie Chan', name: "component 2", age: 11 },
+            { msg: 'Chuck Norris', name: "component 3", age: 12 },
+            { msg: 'Jet Li', name: "component 4", age: 13 },
+            { msg: 'Kung Fury', name: "component 5", age: 14 }
+        ]
+    },
+    components: {
+        comp1: function(resolve, reject){
+            $.ajax({
+                url: "template.html",
+                success: function(data){
+                    resolve({
+                        template: data,
+                        data: function () {
+                            return  { msg: 'Bruce Lee', name: "component 1", age: 10 };
+                        },
+                        methods: {
+                            fire: function(e){
+                                this.$parent.$log(e);
+                                this.$parent.current = "comp2"
+                            }
+                        }
+                    });
+                },
+                error: function(err){
+                    reject(err.statusText);
+                }
+            })
+        },
+        comp2:  {template: "#tmpl2", data: function () {
+            return  { msg: 'Jackie Chan', name: "component 2", age: 11 };
+        },
+            methods: {
+                fire: function(e){
+                    this.$parent.current = "comp1"
+                }
+            }
+        }
+    },
+    methods:{
+        compHdlr: function(e){
+            var t = this.$refs.comp1;
+            this.eventObjs.push(e)
+        }
+        ,onResize: function(){
+            console.log("resizef");
+            this.currWidth = document.body.clientWidth;
+        }
+    }
+});
+window.onresize = function(){demo4.onResize()};
+
+
+    Vue.component("comp2", {
+        props: ["name", "age"],
+        template: "#tmpl1",
+        CompEvent: function(){return {event: {}, name: "", age: ""}},
+        methods: {
+            fire: function(e){
+                var obj = this.$options.CompEvent();
+                obj.event = e; obj.name=this.name;obj.age=this.age;
+                //this.$dispatch("comp1event", JSON.stringify(this.comp1Event));
+                this.$dispatch("comp-event", obj);
+            }
+        },
+        activate: function(done){
+            console.log("activate is done");
+            done();
+        }
+    });
+    Vue.component("my-component", {
+        data: function(){return {childName: "test", age: 11}},
+        template: "<td>" +
+                    "<input type='text' v-model='childName'>" +
+                    "<input type='number' v-model='age'>" +
+                    "<span>this is my component: </span>" +
+                    "<my-child v-bind:name-prop='childName' :age-prop.sync='age'></my-child>" +
+                    //注意如果 prop 是一个对象或数组，是按引用传递。在子组件内修改它会影响父组件的状态，
+                    // 不管是使用哪种绑定类型(无, once, sync)。
+                "</td>"
+        ,components:{
+            "my-child":{
+                //props: ["name-prop", "age-prop"],
+                props: {
+                    "name-prop": {type: String, required: true},
+                    "age-prop": {twoWay: false}
+                },
+                template: "-- my child ({{nameProp}}-{{ageProp}})" + //{{name-prop}} is not allowed here.
+                        "<br/><input type='text' v-model='nameProp'>" +
+                        "<input type='text' v-model='ageProp'>"
+            }
+        }
+    });
+    //组件选项问题
+
+    //传入 Vue 构造器的多数选项也可以用在 Vue.extend() 中，不过有两个特例： data and el。试想如果我们简单地把一个对象作为 data 选项传给 Vue.extend()：
+
+//    var data = { a: 1 }
+//    var MyComponent = Vue.extend({
+//        data: data
+//    })
+    //这么做的问题是 MyComponent 所有的实例将共享同一个 data 对象！这基本不是我们想要的，因此我们应当使用一个函数作为 data 选项，函数返回一个新对象：
+
+//    var MyComponent = Vue.extend({
+//        data: function () {
+//            return { a: 1 }
+//        }
+//    })
+    //同理，el 选项用在 Vue.extend() 中时也须是一个函数。
+//    window.onclick=function(){
+//        demo1.toggleTip();
+//    };
+    Vue.transition('fade1', {
+        css: false,
+        enter: function (el, d) {
+            // 元素已被插入 DOM
+            // 在动画结束后调用 done
+            $(el)
+            .css('opacity', 0)
+            .animate({ opacity: 1 }, 1000, d)
+        },
+        enterCancelled: function (el) {
+            $(el).stop()
+        },
+        leave: function (el, done) {
+            // 与 enter 相同
+            $(el).animate({ opacity: 0 }, 1000, done)
+        },
+        leaveCancelled: function (el) {
+            $(el).stop()
+        }
+    });
+    var demo1 = new Vue({
+        el: '#demo2',
+        data: {
+            eventObjs: [],
+            show: true,
+            comp1: {name: "test", age: 10},
+            list: [
+                { msg: 'Bruce Lee' },
+                { msg: 'Jackie Chan' },
+                { msg: 'Chuck Norris' },
+                { msg: 'Jet Li' },
+                { msg: 'Kung Fury' }
+            ]
+        },
+//        events: {
+//            "comp1Event": function(e){this.eventObjs.push(e)}
+//        },
+        transitions: {
+            stagger: function (index) {
+                // 每个过渡项目增加 50ms 延时
+                // 但是最大延时限制为 300ms
+                return Math.min(4000, index * 3000)
+            },
+            expand: {
+
+                beforeEnter: function (el) {
+                    el.textContent = 'beforeEnter'
+                },
+                enter: function (el) {
+                    el.textContent = 'enter'
+                },
+                afterEnter: function (el) {
+                    el.textContent = 'afterEnter'
+                },
+                enterCancelled: function (el) {
+                    // handle cancellation
+                },
+
+                beforeLeave: function (el) {
+                    el.textContent = 'beforeLeave'
+                },
+                leave: function (el) {
+                    el.textContent = 'leave'
+                },
+                afterLeave: function (el) {
+                    el.textContent = 'afterLeave'
+                },
+                leaveCancelled: function (el) {
+                    // handle cancellation
+                }
+            }
+        },
+        methods:{
+            toggleTip: function(){
+                this.show = !this.show;
+            },
+            compHdlr: function(e){
+                var t = this.$refs.comp1;
+                this.eventObjs.push(e)
+            }
+        }
+    });
+    // 可以使用 @keyup.f1
+    Vue.directive('on').keyCodes.f1 = 112;
+
+    var example = new Vue({
+        el: '#app',
+        data: {
+            age: 0,
+            checkedNames: [],
+            checked:false,
+            filter: "",
+            myBtn1Style: {color: "#FFF", background: "#999"},
+            btnCls: "btn",
+            smallCls: "small",
+            myBtn: {btn: true, small: true},
+            url: "#test",
+            color: "#666",
+            message: 'hello vue.js!',
+            raw_html: "<b>raw html </b>",
+            rawDynPartHtml: "raw-Dyn-Partial",//"<p><b>This is a dynamic partial raw html: {{message}}</b></p>",
+            todosOrg: [
+                { text: 'Learn JavaScript', name:"bush2" },
+                { text: 'Build Something Awesome', name:"bush4"  },
+                { text: 'Learn Vue.js', name:"bush3"  }
+            ],
+            todos:[],
+            isPhone: false,
+            jsonObj: {name: "json", value: {id: "test"}}
+        },
+        computed: {
+            compMsg: {
+                get: function(){
+                    return this.message + "computed to b"
+                },
+                set: function(val){
+                    this.message = val.substring(0, val.length*0.8);
+
+                }
+            }
+        },
+        methods:{
+            search: function(){
+                console.log("search");
+                var that = this;
+                var reg = new RegExp(that.filter, "g");
+                this.todos = this.todosOrg.filter(function(item){
+                    return item.text.match(reg);
+                    //return true;
+                });
+                console.log(this.todos);
+            },
+            addMsg: function(){
+                this.todos.push({text: this.message})
+            },
+            revMsg: function(){
+                this.message = this.message.split(" ").reverse().join(" ");
+                this.rawDynPartHtml = "static-partial";
+
+                //as you can see, the following changes won't affect the view
+                //it tells us, once view was rended, model changes won't take any effect
+                this.myBtn.big = true;
+                this.myBtn1Style.border = "3px solid #000";
+            },
+            removeIt: function(id){
+                //this.todos.splice(id, 1, {text: 'added ' + id});
+                this.todos.$remove(this.todos[id])
+            },
+            changeIt: function(id, $event){
+                console.log($event.target.value);
+                this.todos.$set(id, $.extend({}, this.todos[id], {text: $event.target.value}));
+            },
+            getMsg: function(){
+                return this.message;
+            },
+            onSubmit: function(msg){
+                console.log(msg || "submited");
+            }
+        },
+        created: function(){
+            console.log("an example created event was fired");
+            this.search();
+            // 注册 partial
+            Vue.partial('static-partial', '<p> <b>This is a static partial raw html: {{message}}</b></p>');
+            Vue.partial("raw-Dyn-Partial", "<p><b>This is a dynamic partial raw html: {{message}}</b></p>");
+        },
+        beforeCompile: function(){
+            console.log("an example beforecompile event was fired");
+
+            //as you can see, the following changes will affect the view
+            this.myBtn.big = true;
+            this.myBtn1Style.border = "2px solid #000";
+        },
+        compiled: function(){
+            console.log("an example compiled event was fired");
+        },
+        ready: function(){
+            console.log("an example ready event was fired");
+        },
+        beforeDestroy: function(){
+            console.log("an example's beforedestroy event was fired");
+        },
+        destroyed: function(){
+            console.log("an example's destroyed event was fired");
+        }
+    });
+    example.$watch("message", function(n, o){
+        console.log(n +"/"+o);
+    });
+    example.$watch("age", function(n, o){
+        console.log(n +"/"+o);
+    });
+
+//    字面量语法 vs. 动态语法
+//
+//    初学者常犯的一个错误是使用字面量语法传递数值：
+//
+//    <!-- 传递了一个字符串 "1" -->
+//    <comp some-prop="1"></comp>
+//    因为它是一个字面 prop，它的值以字符串 "1" 而不是以实际的数字传下去。如果想传递一个实际的 JavaScript 数字，需要使用动态语法，从而让它的值被当作 JavaScript 表达式计算：
+//
+//    <!-- 传递实际的数字  -->
+//    <comp :some-prop="1"></comp>
+</script>
+</html>
