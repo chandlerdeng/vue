@@ -1,0 +1,32 @@
+<div>
+    <my-header v-bind:back-fn="backFn"></my-header>
+	<footer class="ui-footer">
+		<div class="w100p">
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="risk(1)">
+					我追求高收益，不介意承受高风险
+				</button>
+			</div>
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="risk(2)">
+					兼顾收益与风险，稳定在8%左右
+				</button>
+			</div>
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="risk(3)">
+					收益高于同期定期存款即可
+				</button>
+			</div>
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="risk(4)">
+					给我一个基本的投资方案
+				</button>
+			</div>
+		</div>
+	</footer>
+	<section class="ui-container  ui-whitespace">
+		<h1 class="pdt30">收益高往往风险高,</h1>
+        <h1 class="pdt30">您希望怎么处理两者的关系？</h1>
+
+	</section>
+</div>

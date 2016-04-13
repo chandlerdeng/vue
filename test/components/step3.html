@@ -1,0 +1,25 @@
+<div>
+    <my-header v-bind:back-fn="backFn"></my-header>
+	<footer class="ui-footer">
+		<div class="w100p mt30">
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="duration(1)">
+					我要做短期投资，1-3月
+				</button>
+			</div>
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="duration(2)">
+					半年左右
+				</button>
+			</div>
+			<div class="ui-btn-wrap">
+				<button class="ui-btn-lg" v-on:click="duration(3)">
+					我要做中长期投资
+				</button>
+			</div>
+		</div>
+	</footer>
+	<section class="ui-container ui-whitespace">
+		<h1 class="pdt30">您期望的投资期限是多长？</h1>
+	</section>
+</div>

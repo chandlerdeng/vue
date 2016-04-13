@@ -1,0 +1,45 @@
+<div>
+    <my-header v-bind:back-fn="backFn"></my-header>
+    <footer class="ui-footer">
+        <div class="w100p">
+            <div class="ui-btn-wrap">
+                <a class="ui-btn-lg" v-link="'step2/50000'">
+                    5万
+                </a>
+            </div>
+            <div class="ui-btn-wrap">
+                <button class="ui-btn-lg" v-on:click="showAmtDlg = true">
+                    其它金额
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <section class="ui-container  ui-whitespace">
+
+        <h1 class="pdt30">您有多少资金用于理财?</h1>
+
+        <div class="ui-dialog" v-bind:class="{show: showAmtDlg}">
+            <div class="ui-dialog-cnt w100p">
+                <header class="ui-dialog-hd ui-border-b">
+                    <i class="ui-dialog-close" v-on:click="showAmtDlg = false"></i>
+                    <h4 style="margin: 0 10%">请输入金额</h4>
+                </header>
+                <div class="ui-dialog-bd">
+                    <form class="ui-form w100p" v-on:submit.prevent="onSubmit">
+                        <div class="ui-form-item ui-form-item-r ui-border-tb">
+                            <input type="tel" placeholder="请输入金额"
+                                   required data-name="金额"
+                                   digits="true" min=100 v-model="amount">
+                            <!-- 若按钮不可点击则添加 disabled 类 -->
+                            <button type="submit" class="ui-border-l" :disabled="isDisabled"
+                                   >确定</button>
+                            <a class="ui-icon-close" v-on:click="amount=null"></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+

@@ -1,0 +1,172 @@
+
+<div>
+	<style>
+        .bbd input{background: none;border: none;width: 100%; border-bottom: 1px solid;}
+        .bbd .blue-bk{background: #283e77; color: white;height: auto	}
+        .bbd p{line-height:100%;}
+        .bbd .ui-icon-close-page{color: white}
+        .bbd .ui-center.hide-on-loading{display: none}
+        .t-align-left p{line-height:150%;}
+        .icon{width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-top: -4px;}
+        .yellow-icon{background: #fcc753; }.yellow-txt{color: #fcc753}
+        .blue-icon{background: #9ac2ff; }.blue-txt{color: #9ac2ff}
+        .red-txt{color: #f52727}.grey-txt{color: #808080}.white-txt{color: #fff}
+        .bbd-body.ui-center{display:block}
+        button.ui-btn.v-align-top {top: 0;
+            background: none;
+            border: none;
+            color: white;
+            line-height: 44px;
+            margin-top: 0;
+            height: auto;
+        }
+        .bbd .slide-right-transition,
+        .bbd .slide-left-transition,
+        .bbd [class^=slide-] .ui-header,
+        .bbd [class^=slide-] .ui-footer{transition: none;}
+	</style>
+    <div class="ui-loading-block show"><div class="ui-loading-cnt"><i class="ui-loading-bright"></i><p>加载中...</p></div></div>
+    <header class="ui-header ui-header-stable blue-bk hide-on-loading step4">
+        <i class="ui-icon-close-page" v-on:click="backFn"></i><h1 style="margin: 0 10%">理财方案</h1>
+        <button
+            class="ui-btn v-align-top"  v-link="'/step1'">重新评测</button>
+        <div class="w100p" data-height="52"
+                ><div class="w50p h100p in-block v-align-top"
+                ><section class="ui-container ui-center"
+                ><div id="interest" class="lh0 w100p"
+                      data-thickness="5.1" data-size="40"
+                ></div
+                ><div class="abs w100p lh100p" style="top:40%"
+                      data-font-size="2.8"
+                ><div><span data-font-size="5.5" >{{calcData.totalIntr*100 | toFix 1}}</span>%</div
+                ><div style="margin-top: 3%">综合年化收益率</div
+                ></div
+                ></section
+                ></div
+                ><div class="w50p h100p in-block v-align-top"
+                ><section class="ui-container ui-center">
+            <div class="w100p t-align-left ui-whitespace lh100p">
+                <div style="margin-bottom: 5%;" data-font-size="3.2">投资总金额(元)</div>
+                <div style="margin-bottom: 5%;" >
+                    <input id="investAmt" class="white-txt" type="tel" placeholder="请输入金额"
+                           data-font-size="5.8" v-on:keyup="onAmtChange"
+                           value="{{* submitData.invAmt}}"></div>
+                <div style="margin-bottom: 8%;" data-font-size="3.2">回款利息(元)</div>
+                <div style="margin-bottom: 8%;" data-font-size="3.7">{{calcData.totalProfit | currency ''}}</div>
+            </div>
+            <!--<div class="w100p" style="background: rgba(0, 0, 0, 0.20); border-radius: 5px;line-height:250%"
+                 data-font-size="2.8">最后一期回款</div>-->
+        </section
+                ></div
+                ></div>
+    </header>
+    <section class="bbd-body ui-container ui-center bdr-box hide-on-loading " data-border-top="46.8">
+        <div class="ui-whitespace w100p blue-bk pdb10">
+            <table  class="w100p t-align-left" style="line-height: 180%;" data-font-size="3.2">
+                <tr>
+                    <td class="yellow-txt" colspan="2"><i class="icon yellow-icon mr10"></i>散标投资 ({{calcData.sbPerc}}%)</td>
+                    <td class="blue-txt" colspan="2"><i class="icon blue-icon mr10"></i>债权转让 ({{calcData.zqPerc}}%)</td>
+                </tr>
+                <tr>
+                    <td class="grey-txt" >投资总额</td>
+                    <td data-font-size="3.5" >{{calcData.sbAmount | currency ''}}</td>
+                    <td class="grey-txt" >投资总额</td>
+                    <td data-font-size="3.5" >{{calcData.zqAmount | currency ''}}</td>
+                </tr>
+                <tr>
+                    <td class="grey-txt" >预期收益</td>
+                    <td data-font-size="3.5" >{{calcData.sbProfit | currency ''}}</td>
+                    <td class="grey-txt" >预期收益</td>
+                    <td data-font-size="3.5" >{{calcData.zqProfit | currency ''}}</td>
+                </tr>
+            </table>
+        </div>
+        <div v-if="calcData.sbAmount>0">
+
+            <ul class="ui-list ui-list-text t-align-left mt20 yellow-icon white-txt">
+                <li>
+                    <div class="ui-list-info" data-font-size="4.4">
+                        散标投资
+                    </div>
+                    <div class="ui-list-action intrRate" data-font-size="6.4">
+                        <span >{{calcData.sbAmount | currency ''}}</span>
+                        <span data-font-size="3.2">元</span></div>
+                </li>
+            </ul>
+
+            <div class="w100p" data-font-size="3.2" v-for="biao in ajaxData | filterBy 'APPLY' in 'type'">
+                <ul class="ui-list ui-list-text ui-list-link ui-border-tb "
+                    onclick="$.loading();location.href='/invest/lend/detail.action?id={{biao.id}}'">
+                    <li class="ui-border-t" onclick="location.href='#'">
+                        <table  class="w100p lh100p" style="margin: 3% 0">
+                            <tr class="v-align-top">
+                                <td class="ui-border-r red-txt">
+                                    <div class="w100p" style="margin: 10% 0 4% 0;">
+                                        <span data-font-size="8" >{{biao.interest*100 | toFix 1}}</span>%
+                                    </div></td>
+                                <td class="grey-txt t-align-right pdr10">投资期限(月)</td>
+                                <td class="t-align-left"><b>{{biao.months}}</b></td>
+                            </tr>
+                            <tr>
+                                <td class="grey-txt ui-border-r" style=" width: 30%; ">年利率</td>
+                                <td class="grey-txt t-align-right pdr10" style=" width: 35%; ">预期收益(元)</td>
+                                <td class="t-align-left"><b>
+                                    {{biao.preAmt | currency ''}}</b></td>
+                            </tr>
+                        </table>
+                        <div class="ui-txt-info"></div>
+                    </li>
+                </ul>
+                <ul class="ui-list ui-list-text ui-border-b mb10">
+                    <li class="ui-border-t">
+                        <h4 class="ui-nowrap"></h4>
+                        <div class="ui-txt-info">预投金额<span>{{biao.preInvestAmt | currency ''}}</span>元</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div v-if="calcData.zqAmount>0">
+
+            <ul class="ui-list ui-list-text t-align-left mt20 blue-icon white-txt">
+                <li>
+                    <div class="ui-list-info " data-font-size="4.4">
+                        债权转让
+                    </div>
+                    <div class="ui-list-action intrRate" data-font-size="6.4">
+                        <span >{{calcData.zqAmount | currency ''}}</span>
+                        <span  data-font-size="3.2">元</span></div>
+                </li>
+            </ul>
+            <div class="w100p" data-font-size="3.2" v-for="biao in  ajaxData | filterBy 'CLAIM' in 'type'">
+                <ul class="ui-list ui-list-text ui-list-link ui-border-tb "
+                    onclick="$.loading();location.href='/invest/transfer/detail.action?id={{biao.id}}&sellID={{biao.sellerID}}'">
+                    <li class="ui-border-t" onclick="location.href='#'">
+                        <table  class="w100p lh100p" style="margin: 3% 0">
+                            <tr class="v-align-top">
+                                <td class="ui-border-r red-txt">
+                                    <div class="w100p" style="margin: 10% 0 4% 0;">
+                                        <span data-font-size="8" >{{biao.interest*100 | toFix 1}}</span>%
+                                    </div></td>
+                                <td class="grey-txt t-align-right pdr10">投资期限(月)</td>
+                                <td class="t-align-left"><b>{{biao.months}}</b></td>
+                            </tr>
+                            <tr>
+                                <td class="grey-txt ui-border-r" style=" width: 30%; ">年利率</td>
+                                <td class="grey-txt t-align-right pdr10" style=" width: 35%; ">预期收益(元)</td>
+                                <td class="t-align-left"><b>
+                                    {{biao.preAmt | currency ''}}</b></td>
+                            </tr>
+                        </table>
+                        <div class="ui-txt-info"></div>
+                    </li>
+                </ul>
+                <ul class="ui-list ui-list-text ui-border-b mb10">
+                    <li class="ui-border-t">
+                        <h4 class="ui-nowrap"></h4>
+                        <div class="ui-txt-info">预投金额<span>{{biao.preInvestAmt | currency ''}}</span>元</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
